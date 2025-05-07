@@ -94,7 +94,6 @@ describe('MovementsController', () => {
     const balances: Balance[] = [
       { date: new Date('2025-01-01'), balance: 0 },
       { date: new Date('2025-01-03'), balance: 100 },
-      { date: new Date('2025-01-05'), balance: 50 },
     ];
 
     try {
@@ -106,6 +105,40 @@ describe('MovementsController', () => {
           expect.arrayContaining([
             expect.objectContaining({
               type: 'Duplicate',
+              details: ['1'].join(', '),
+              message: ValidationErrorMessage.Duplicate,
+            }),
+          ]),
+        );
+      } else {
+        fail('Expected an HttpException to be thrown');
+      }
+    }
+  });
+
+  it('should fail and detect multiple duplicates movements and return an error', () => {
+    const movements: Movement[] = [
+      { id: 1, date: new Date('2025-01-02'), label: 'Deposit', amount: 100 },
+      { id: 4, date: new Date('2025-01-04'), label: 'Withdrawal', amount: -50 },
+      { id: 3, date: new Date('2025-01-04'), label: 'Withdrawal', amount: -50 },
+      { id: 1, date: new Date('2025-01-02'), label: 'Deposit', amount: 100 },
+      { id: 4, date: new Date('2025-01-04'), label: 'Withdrawal', amount: -50 },
+    ];
+    const balances: Balance[] = [
+      { date: new Date('2025-01-01'), balance: 0 },
+      { date: new Date('2025-01-03'), balance: 100 },
+    ];
+
+    try {
+      controller.validation(movements, balances);
+      fail('Expected an error to be thrown');
+    } catch (error) {
+      if (error instanceof HttpException) {
+        expect(error.cause).toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({
+              type: 'Duplicate',
+              details: ['1', '4'].join(', '),
               message: ValidationErrorMessage.Duplicate,
             }),
           ]),

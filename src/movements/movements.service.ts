@@ -102,13 +102,20 @@ export class MovementsService {
     // Map id => count
     const seen: Record<number, number> = {};
     for (const movement of movements) {
-      if (seen[movement.id]) {
-        return {
-          type: 'Duplicate',
-          message: ValidationErrorMessage.Duplicate,
-        };
-      }
-      seen[movement.id] = 1;
+      seen[movement.id] = seen[movement.id] + 1 || 1;
+    }
+
+    // Detect multiple duplicates and return all occurences
+    const multiples = Object.entries(seen)
+      .filter(([_, count]) => count > 1)
+      .map(([id]) => id);
+    if (multiples.length > 0) {
+      return {
+        type: 'Duplicate',
+        message: ValidationErrorMessage.Duplicate,
+        details: multiples.join(', '),
+      };
+    }
 
     return null;
   }
