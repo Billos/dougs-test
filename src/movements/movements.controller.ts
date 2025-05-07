@@ -1,6 +1,7 @@
 import { Body, Controller, HttpCode, HttpException, Post } from '@nestjs/common';
-import { MovementsService } from './movements.service';
+
 import { Balance, Movement } from './movement.model';
+import { MovementsService } from './movements.service';
 
 @Controller('/movements')
 export class MovementsController {

@@ -1,9 +1,11 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import { fail } from 'assert';
+
 import { HttpException } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+
+import { Balance, Movement, ValidationErrorMessage } from './movement.model';
 import { MovementsController } from './movements.controller';
 import { MovementsService } from './movements.service';
-import { Balance, Movement, ValidationErrorMessage } from './movement.model';
-import { fail } from 'assert';
 
 describe('MovementsController', () => {
   let controller: MovementsController;

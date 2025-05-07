@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+
 import { Balance, Movement, ValidationError, ValidationErrorMessage } from './movement.model';
 
 type MovementGroup = {
@@ -108,7 +109,7 @@ export class MovementsService {
         };
       }
       seen[movement.id] = 1;
-    }
+
     return null;
   }
 }
