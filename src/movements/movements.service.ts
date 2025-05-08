@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 
-import { Balance, Movement, ValidationError, ValidationErrorMessage } from './movement.model';
+import { Balance, Movement, SafeBalances, ValidationError, ValidationErrorMessage } from './movement.model';
 
 type MovementGroup = {
   movements: Movement[];
@@ -13,7 +13,7 @@ export class MovementsService {
   private readonly logger = new Logger(MovementsService.name);
   validation(movements: Movement[], balances: Balance[]): ValidationError[] {
     // Ensure there are at least two balances
-    if (balances.length < 2) {
+    if (!this.isSafeBalances(balances)) {
       return [{ type: 'BalancesMissing', message: ValidationErrorMessage.BalancesMissing }];
     }
 
@@ -42,38 +42,46 @@ export class MovementsService {
   }
 
   /**
+   * Ensures that the balances array has at least two elements.
+   * @param balances the ordered balances
+   * @returns true if the balances array has at least two elements, false otherwise
+   */
+  private isSafeBalances(balances: Balance[]): balances is SafeBalances {
+    return balances.length >= 2;
+  }
+
+  /**
    * This function groups movements by time period based on the balances.
    * It slices the movements array into groups based on the start and end dates of each balance.
    * This function might be a bit overkill, but it allows us to group the movements in one operation without parsing and filtering each time the movements array.
    * @param movements the ordered movements
-   * @param balances the ordered balances
+   * @param balances the ordered balances, it needs to have at least 2 elements
    */
-  private groupMovementsByTimePeriod(movements: Movement[], balances: Balance[]): MovementGroup[] {
+  private groupMovementsByTimePeriod(movements: Movement[], balances: SafeBalances): MovementGroup[] {
     const groupedMovements: MovementGroup[] = [];
 
-    // Skiping until the first movement in the period range
-    let currentMovementIndex = movements.findIndex((movement) => movement.date >= balances[0].date);
-    // For each period, getting the movements subset
-    for (const startBalance of balances) {
-      // Stop if we reach the last balance
-      if (balances.indexOf(startBalance) === balances.length - 1) {
-        break;
-      }
+    // Remove the movements prior to the first balance
+    const firstMovement = movements.findIndex((movement) => movement.date >= balances[0].date);
+    if (firstMovement !== -1) {
+      movements.splice(0, firstMovement);
+    }
 
-      // Defining the end balance
-      const endBalance = balances[balances.indexOf(startBalance) + 1];
+    // For each period, getting the movements subset
+    for (let i = 0, j = 1; j < balances.length; i++, j++) {
+      const startBalance = balances[i];
+      const endBalance = balances[j];
 
       // If findIndex returns -1, lastMovementIndex is set to the last index of the movements array
       const lastMovementIndex = movements.findIndex((movement) => movement.date >= endBalance.date);
       const safeLastMovementIndex = lastMovementIndex === -1 ? movements.length : lastMovementIndex;
 
-      const movementsSubset = movements.slice(currentMovementIndex, safeLastMovementIndex);
+      // Removing the subset movements from the original movements array into the group
+      const movementsSubset = movements.splice(0, safeLastMovementIndex);
       groupedMovements.push({
         movements: movementsSubset,
         start: startBalance,
         end: endBalance,
       });
-      currentMovementIndex = safeLastMovementIndex;
     }
     return groupedMovements;
   }

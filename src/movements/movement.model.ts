@@ -10,6 +10,11 @@ export type Balance = {
   balance: number;
 };
 
+/**
+ * A SafeBalance is a set of at least 2 balances.
+ */
+export type SafeBalances = [Balance, Balance, ...Balance[]];
+
 export enum ValidationErrorMessage {
   BalancesMissing = 'At least one balance is missing',
   WithdrawalDifference = 'At least one withdrawal is missing',
