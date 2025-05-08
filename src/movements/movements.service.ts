@@ -44,10 +44,12 @@ export class MovementsService {
 
   /**
    * Ensures that the balances array has at least two elements.
+   * This function is public to allow testing. But should not be used outside of the service.
+   * @private
    * @param balances the ordered balances
    * @returns true if the balances array has at least two elements, false otherwise
    */
-  private isSafeBalances(balances: Balance[]): balances is SafeBalances {
+  public isSafeBalances(balances: Balance[]): balances is SafeBalances {
     return balances.length >= 2;
   }
 
@@ -55,10 +57,12 @@ export class MovementsService {
    * This function groups movements by time period based on the balances.
    * It slices the movements array into groups based on the start and end dates of each balance.
    * This function might be a bit overkill, but it allows us to group the movements in one operation without parsing and filtering each time the movements array.
+   * This function is public to allow testing. But should not be used outside of the service.
+   * @private
    * @param movements the ordered movements
    * @param balances the ordered balances, it needs to have at least 2 elements
    */
-  private groupMovementsByTimePeriod(movements: Movement[], balances: SafeBalances): MovementGroup[] {
+  public groupMovementsByTimePeriod(movements: Movement[], balances: SafeBalances): MovementGroup[] {
     const groupedMovements: MovementGroup[] = [];
 
     // Remove the movements prior to the first balance
@@ -87,7 +91,14 @@ export class MovementsService {
     return groupedMovements;
   }
 
-  private validateMovementGroup({ movements, start, end }: MovementGroup): ValidationError | null {
+  /**
+   * This function validates a group of movements by checking if the total amount of movements matches the expected balance change.
+   * This function is public to allow testing. But should not be used outside of the service.
+   * @private
+   * @param movementGroup the group of movements to validate
+   * @returns A ValidationError if there is a difference, null otherwise
+   */
+  public validateMovementGroup({ movements, start, end }: MovementGroup): ValidationError | null {
     const totalAmount = movements.reduce((sum, movement) => sum + movement.amount, 0);
     const expectedBalanceChange = end.balance - start.balance;
 
@@ -107,7 +118,14 @@ export class MovementsService {
     };
   }
 
-  private detectDuplicates(movements: Movement[]): ValidationError | null {
+  /**
+   * Detects duplicates in the movements array.
+   * This function is public to allow testing. But should not be used outside of the service.
+   * @private
+   * @param movements
+   * @returns Returns a ValidationError if duplicates are found, null otherwise.
+   */
+  public detectDuplicates(movements: Movement[]): ValidationError | null {
     // Map id => count
     const seen: Record<number, number> = {};
     for (const movement of movements) {
