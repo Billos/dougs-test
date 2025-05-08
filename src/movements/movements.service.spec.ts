@@ -124,9 +124,31 @@ describe('MovementsService', () => {
       expect(result).toBeNull();
     });
 
-    it('should return a withdrawal difference error for a detected withdrawal', () => {
+    it('should return a withdrawal difference error for a detected withdrawal difference with no matching movement', () => {
       const movements: Movement[] = [
-        { id: 1, date: new Date('2025-01-01'), label: 'Deposit', amount: 10 },
+        { id: 1, date: new Date('2025-01-01'), label: 'Deposit', amount: 20 },
+        { id: 2, date: new Date('2025-01-02'), label: 'Deposit', amount: 20 },
+        { id: 3, date: new Date('2025-01-03'), label: 'Deposit', amount: 30 },
+        { id: 4, date: new Date('2025-01-06'), label: 'Deposit', amount: 40 },
+      ];
+      const group: MovementGroup = {
+        movements,
+        start: { date: new Date('2025-01-01'), balance: 0 },
+        end: { date: new Date('2025-01-07'), balance: 71 },
+      };
+      const result = service.validateMovementGroup(group);
+      expect(result).toEqual({
+        type: 'Difference',
+        message: ValidationErrorMessage.WithdrawalDifference,
+        period: { start: new Date('2025-01-01'), end: new Date('2025-01-07') },
+        difference: 39,
+        details: '',
+      });
+    });
+
+    it('should return a withdrawal difference error for a detected withdrawal difference with one matching movement', () => {
+      const movements: Movement[] = [
+        { id: 1, date: new Date('2025-01-01'), label: 'Deposit', amount: 20 },
         { id: 2, date: new Date('2025-01-02'), label: 'Deposit', amount: 20 },
         { id: 3, date: new Date('2025-01-03'), label: 'Deposit', amount: 30 },
         { id: 4, date: new Date('2025-01-06'), label: 'Deposit', amount: 40 },
@@ -141,11 +163,33 @@ describe('MovementsService', () => {
         type: 'Difference',
         message: ValidationErrorMessage.WithdrawalDifference,
         period: { start: new Date('2025-01-01'), end: new Date('2025-01-07') },
-        difference: 30,
+        difference: 40,
+        details: 'The following movements match the difference: 4',
       });
     });
 
-    it('should return a deposit difference error for a detected deposit', () => {
+    it('should return a withdrawal difference error for a detected withdrawal difference with two matching movements', () => {
+      const movements: Movement[] = [
+        { id: 3, date: new Date('2025-01-03'), label: 'Deposit', amount: 30 },
+        { id: 4, date: new Date('2025-01-06'), label: 'Deposit', amount: 40 },
+        { id: 5, date: new Date('2025-01-06'), label: 'Deposit', amount: 40 },
+      ];
+      const group: MovementGroup = {
+        movements,
+        start: { date: new Date('2025-01-01'), balance: 0 },
+        end: { date: new Date('2025-01-07'), balance: 70 },
+      };
+      const result = service.validateMovementGroup(group);
+      expect(result).toEqual({
+        type: 'Difference',
+        message: ValidationErrorMessage.WithdrawalDifference,
+        period: { start: new Date('2025-01-01'), end: new Date('2025-01-07') },
+        difference: 40,
+        details: 'The following movements match the difference: 4, 5',
+      });
+    });
+
+    it('should return a deposit difference error for a detected deposit difference with no matching movement', () => {
       const movements: Movement[] = [
         { id: 1, date: new Date('2025-01-01'), label: 'Deposit', amount: 10 },
         { id: 3, date: new Date('2025-01-03'), label: 'Deposit', amount: 30 },
@@ -162,6 +206,51 @@ describe('MovementsService', () => {
         type: 'Difference',
         message: ValidationErrorMessage.DepositDifference,
         period: { start: new Date('2025-01-01'), end: new Date('2025-01-07') },
+        details: '',
+        difference: -20,
+      });
+    });
+
+    it('should return a deposit difference error for a detected deposit difference with one matching movement', () => {
+      const movements: Movement[] = [
+        { id: 1, date: new Date('2025-01-01'), label: 'Deposit', amount: 100 },
+        { id: 3, date: new Date('2025-01-03'), label: 'Deposit', amount: 30 },
+        { id: 5, date: new Date('2025-01-03'), label: 'Withdrawal', amount: -20 },
+        { id: 4, date: new Date('2025-01-06'), label: 'Withdrawal', amount: -50 },
+      ];
+      const group: MovementGroup = {
+        movements,
+        start: { date: new Date('2025-01-01'), balance: 0 },
+        end: { date: new Date('2025-01-07'), balance: 80 },
+      };
+      const result = service.validateMovementGroup(group);
+      expect(result).toEqual({
+        type: 'Difference',
+        message: ValidationErrorMessage.DepositDifference,
+        period: { start: new Date('2025-01-01'), end: new Date('2025-01-07') },
+        details: 'The following movements match the difference: 5',
+        difference: -20,
+      });
+    });
+    it('should return a deposit difference error for a detected deposit difference with two matching movements', () => {
+      const movements: Movement[] = [
+        { id: 1, date: new Date('2025-01-01'), label: 'Deposit', amount: 100 },
+        { id: 3, date: new Date('2025-01-03'), label: 'Deposit', amount: 30 },
+        { id: 5, date: new Date('2025-01-03'), label: 'Withdrawal', amount: -20 },
+        { id: 6, date: new Date('2025-01-03'), label: 'Withdrawal', amount: -20 },
+        { id: 4, date: new Date('2025-01-06'), label: 'Withdrawal', amount: -30 },
+      ];
+      const group: MovementGroup = {
+        movements,
+        start: { date: new Date('2025-01-01'), balance: 0 },
+        end: { date: new Date('2025-01-07'), balance: 80 },
+      };
+      const result = service.validateMovementGroup(group);
+      expect(result).toEqual({
+        type: 'Difference',
+        message: ValidationErrorMessage.DepositDifference,
+        period: { start: new Date('2025-01-01'), end: new Date('2025-01-07') },
+        details: 'The following movements match the difference: 5, 6',
         difference: -20,
       });
     });

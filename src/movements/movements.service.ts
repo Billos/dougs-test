@@ -99,10 +99,13 @@ export class MovementsService {
    * @returns A ValidationError if there is a difference, null otherwise
    */
   public validateMovementGroup({ movements, start, end }: MovementGroup): ValidationError | null {
+    // Movements total
     const totalAmount = movements.reduce((sum, movement) => sum + movement.amount, 0);
+    // Expected difference between the start and end balance
     const expectedBalanceChange = end.balance - start.balance;
+    const difference = totalAmount - expectedBalanceChange;
 
-    if (totalAmount - expectedBalanceChange === 0) {
+    if (difference === 0) {
       return null;
     }
 
@@ -110,11 +113,20 @@ export class MovementsService {
       totalAmount > expectedBalanceChange
         ? ValidationErrorMessage.WithdrawalDifference
         : ValidationErrorMessage.DepositDifference;
+
+    let details = '';
+    // If we find a movement that matches the difference, we can suggest it as being the issue in the details
+    const matchingMovements = movements.filter((movement) => movement.amount === difference);
+    if (matchingMovements.length > 0) {
+      details = `The following movements match the difference: ${matchingMovements.map((movement) => movement.id).join(', ')}`;
+    }
+
     return {
       type: 'Difference',
       message,
       period: { start: start.date, end: end.date },
-      difference: totalAmount - expectedBalanceChange,
+      difference,
+      details,
     };
   }
 
