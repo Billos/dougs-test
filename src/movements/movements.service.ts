@@ -1,12 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common';
 
-import { Balance, Movement, SafeBalances, ValidationError, ValidationErrorMessage } from './movement.model';
-
-type MovementGroup = {
-  movements: Movement[];
-  start: Balance;
-  end: Balance;
-};
+import {
+  Balance,
+  Movement,
+  MovementGroup,
+  SafeBalances,
+  ValidationError,
+  ValidationErrorMessage,
+} from './movement.model';
 
 @Injectable()
 export class MovementsService {

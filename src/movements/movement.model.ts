@@ -11,6 +11,15 @@ export type Balance = {
 };
 
 /**
+ * Represents a group of movements along with their start and end balances.
+ */
+export type MovementGroup = {
+  movements: Movement[];
+  start: Balance;
+  end: Balance;
+};
+
+/**
  * A SafeBalance is a set of at least 2 balances.
  */
 export type SafeBalances = [Balance, Balance, ...Balance[]];
