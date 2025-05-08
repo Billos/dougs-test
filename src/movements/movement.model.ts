@@ -1,3 +1,10 @@
+/**
+ * Represents a bank movement with an ID, date, label, and amount.
+ * @param id The unique identifier of the movement.
+ * @param date The date of the movement.
+ * @param label The label or description of the movement.
+ * @param amount The amount of the movement.
+ */
 export type Movement = {
   id: number;
   date: Date;
@@ -5,6 +12,11 @@ export type Movement = {
   amount: number;
 };
 
+/**
+ * Represents a balance at a specific date.
+ * @param date The date of the balance.
+ * @param balance The balance amount.
+ */
 export type Balance = {
   date: Date;
   balance: number;
@@ -24,6 +36,9 @@ export type MovementGroup = {
  */
 export type SafeBalances = [Balance, Balance, ...Balance[]];
 
+/**
+ * ValidationErrorMessage is an enum that represents the different error messages that can occur during validation.
+ */
 export enum ValidationErrorMessage {
   BalancesMissing = 'At least one balance is missing',
   WithdrawalDifference = 'At least one withdrawal is missing',
