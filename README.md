@@ -50,7 +50,7 @@ You can test a POST request to the /movements/validation endpoint using the foll
 
 ### Valid request
 
-````bash
+```bash
 curl -X POST http://localhost:3000/movements/validation \
 -H "Content-Type: application/json" \
 -d '{
@@ -63,7 +63,8 @@ curl -X POST http://localhost:3000/movements/validation \
     { "date": "2025-01-03", "balance": 100 },
     { "date": "2025-01-05", "balance": 50 }
   ]
-}'```
+}'
+```
 
 ### Invalid request with valid data
 
@@ -80,7 +81,8 @@ curl -X POST http://localhost:3000/movements/validation \
     { "date": "2025-01-03", "balance": 200 },
     { "date": "2025-01-05", "balance": 50 }
   ]
-}'```
+}'
+```
 
 ### Invalid request with invalid data
 
@@ -98,7 +100,7 @@ curl -X POST http://localhost:3000/movements/validation \
     { "date": "2025-01-05", "balance": 50 }
   ]
 }'
-````
+```
 
 ## Run tests
 
