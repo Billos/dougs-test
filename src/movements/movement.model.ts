@@ -1,26 +1,62 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+import { Type } from 'class-transformer';
+import { IsArray, IsDate, IsNumber, IsString, ValidateNested } from 'class-validator';
+
 /**
  * Represents a bank movement with an ID, date, label, and amount.
+ * Using class-validator and class-transformer for validation and transformation.
  * @param id The unique identifier of the movement.
  * @param date The date of the movement.
  * @param label The label or description of the movement.
  * @param amount The amount of the movement.
  */
-export type Movement = {
+export class Movement {
+  @IsNumber()
   id: number;
+
+  @Type(() => Date)
+  @IsDate()
   date: Date;
+
+  @IsString()
   label: string;
+
+  @IsNumber()
   amount: number;
-};
+}
 
 /**
  * Represents a balance at a specific date.
+ * Using class-validator and class-transformer for validation and transformation.
  * @param date The date of the balance.
  * @param balance The balance amount.
  */
-export type Balance = {
+export class Balance {
+  @Type(() => Date)
+  @IsDate()
   date: Date;
+
+  @IsNumber()
   balance: number;
-};
+}
+
+/**
+ * Represents a request for validation containing movements and balances.
+ * Using class-validator and class-transformer for validation and transformation.
+ * @param movements An array of movements to be validated.
+ * @param balances An array of balances to be validated.
+ */
+export class ValidationRequest {
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => Movement)
+  movements: Movement[];
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => Balance)
+  balances: Balance[];
+}
 
 /**
  * Represents a group of movements along with their start and end balances.

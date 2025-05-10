@@ -1,16 +1,16 @@
-import { Body, Controller, HttpCode, HttpException, Post } from '@nestjs/common';
+import { Body, Controller, HttpCode, HttpException, Post, UsePipes, ValidationPipe } from '@nestjs/common';
 
-import { Balance, Movement } from './movement.model';
+import { ValidationRequest } from './movement.model';
 import { MovementsService } from './movements.service';
 
 @Controller('/movements')
 export class MovementsController {
   constructor(private readonly movementsService: MovementsService) {}
-
   @Post('/validation')
+  @UsePipes(new ValidationPipe({ transform: true }))
   // Return 200 OK if the validation is successful
   @HttpCode(200)
-  validation(@Body('movements') movements: Movement[], @Body('balances') balances: Balance[]): boolean {
+  validation(@Body() { movements, balances }: ValidationRequest): boolean {
     const cause = this.movementsService.validation(movements, balances);
 
     // Return 200 OK if the validation is successful
