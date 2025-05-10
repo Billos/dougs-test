@@ -44,6 +44,62 @@ $ yarn run start:dev
 $ yarn run start:prod
 ```
 
+## HTTP queries
+
+You can test a POST request to the /movements/validation endpoint using the following commands:
+
+### Valid request
+
+````bash
+curl -X POST http://localhost:3000/movements/validation \
+-H "Content-Type: application/json" \
+-d '{
+  "movements": [
+    { "id": 1, "date": "2025-01-02", "label": "Deposit", "amount": 100 },
+    { "id": 2, "date": "2025-01-04", "label": "Withdrawal", "amount": -50 }
+  ],
+  "balances": [
+    { "date": "2025-01-01", "balance": 0 },
+    { "date": "2025-01-03", "balance": 100 },
+    { "date": "2025-01-05", "balance": 50 }
+  ]
+}'```
+
+### Invalid request with valid data
+
+```bash
+curl -X POST http://localhost:3000/movements/validation \
+-H "Content-Type: application/json" \
+-d '{
+  "movements": [
+    { "id": 1, "date": "2025-01-02", "label": "Deposit", "amount": 100 },
+    { "id": 2, "date": "2025-01-04", "label": "Withdrawal", "amount": -50 }
+  ],
+  "balances": [
+    { "date": "2025-01-01", "balance": 0 },
+    { "date": "2025-01-03", "balance": 200 },
+    { "date": "2025-01-05", "balance": 50 }
+  ]
+}'```
+
+### Invalid request with invalid data
+
+```bash
+curl -X POST http://localhost:3000/movements/validation \
+-H "Content-Type: application/json" \
+-d '{
+  "movements": [
+    { "id": 1, "date": "2025-01-02", "label": "Deposit", "amount": true },
+    { "id": 2, "date": "2025-01-04", "label": "Withdrawal", "amount": -50 }
+  ],
+  "balances": [
+    { "date": "2025-01-01", "balance": 0 },
+    { "date": "2025-01-03", "balance": 200 },
+    { "date": "2025-01-05", "balance": 50 }
+  ]
+}'
+````
+
 ## Run tests
 
 ```bash
