@@ -34,7 +34,7 @@ describe('MovementsController', () => {
       { date: new Date('2025-01-05'), balance: 50 },
     ];
 
-    const response = controller.validation(movements, balances);
+    const response = controller.validation({ movements, balances });
     expect(response).toEqual(true);
   });
 
@@ -50,7 +50,7 @@ describe('MovementsController', () => {
       { date: new Date('2025-01-05'), balance: 50 },
     ];
 
-    const response = controller.validation(movements, balances);
+    const response = controller.validation({ movements, balances });
     expect(response).toEqual(true);
   });
 
@@ -66,7 +66,7 @@ describe('MovementsController', () => {
       { date: new Date('2025-01-05'), balance: 50 },
     ];
 
-    const response = controller.validation(movements, balances);
+    const response = controller.validation({ movements, balances });
     expect(response).toEqual(true);
   });
 
@@ -81,7 +81,7 @@ describe('MovementsController', () => {
       { date: new Date('2025-01-01'), balance: 0 },
     ];
 
-    const response = controller.validation(movements, balances);
+    const response = controller.validation({ movements, balances });
     expect(response).toEqual(true);
   });
 
@@ -97,7 +97,7 @@ describe('MovementsController', () => {
     ];
 
     try {
-      controller.validation(movements, balances);
+      controller.validation({ movements, balances });
       fail('Expected an error to be thrown');
     } catch (error) {
       if (error instanceof HttpException) {
@@ -130,7 +130,7 @@ describe('MovementsController', () => {
     ];
 
     try {
-      controller.validation(movements, balances);
+      controller.validation({ movements, balances });
       fail('Expected an error to be thrown');
     } catch (error) {
       if (error instanceof HttpException) {
@@ -157,7 +157,7 @@ describe('MovementsController', () => {
       { date: new Date('2025-01-05'), balance: 50 },
     ];
     try {
-      controller.validation(movements, balances);
+      controller.validation({ movements, balances });
       fail('Expected an error to be thrown');
     } catch (error) {
       if (error instanceof HttpException) {
@@ -185,7 +185,7 @@ describe('MovementsController', () => {
       { date: new Date('2025-01-05'), balance: 50 },
     ];
     try {
-      controller.validation(movements, balances);
+      controller.validation({ movements, balances });
       fail('Expected an error to be thrown');
     } catch (error) {
       if (error instanceof HttpException) {
@@ -213,7 +213,7 @@ describe('MovementsController', () => {
     const balances: Balance[] = [{ date: new Date('2025-01-01'), balance: 0 }];
 
     try {
-      controller.validation(movements, balances);
+      controller.validation({ movements, balances });
       fail('Expected an error to be thrown');
     } catch (error) {
       if (error instanceof HttpException) {
